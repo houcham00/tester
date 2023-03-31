@@ -20,10 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: check.sh $(pwd) $(pwd)
-      - run: |
-          checker=$(cat coding-style-reports.log)
-          echo"::error checker"
-      #coding style error annotation
+      - run: cat coding-style-reports.log
 
 
   check_program_compilation:
