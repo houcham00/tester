@@ -9,7 +9,7 @@ on:
 
 env:
   MIRROR_URL: "git@github.com:houcham00/chocolatine-tester.git"
-  EXECUTABLES: "mysh"
+  EXECUTABLES: "test"
 
 
 jobs:
