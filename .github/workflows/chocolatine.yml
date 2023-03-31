@@ -1,0 +1,76 @@
+name: chocolatine
+on:
+  push:
+    branches-ignore:
+      - ga-ignore-*
+  pull_request:
+    branches-ignore:
+      - ga-ignore-*
+
+env:
+  MIRROR_URL: "git@github.com:houcham00/chocolatine-tester.git"
+  EXECUTABLES: "mysh"
+
+
+jobs:
+  check_coding_style:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/epitech/coding-style-checker:latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: check.sh $(pwd) $(pwd)
+      - run: |
+          checker=$(cat coding-style-reports.log)
+          echo"::error checker"
+      #coding style error annotation
+
+
+  check_program_compilation:
+    runs-on: ubuntu-latest
+    needs: [check_coding_style]
+    container: epitechcontent/epitest-docker
+    timeout-minutes: 2
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+      - name: Build the code
+        run: make
+      - name: Clean the code
+        run: make clean
+      - name: Check for executables
+        run: |
+          for exe in $(echo $EXECUTABLES | tr "," "\n"); do
+            if [ ! -x $exe ]; then
+              echo "Error: $exe not found or not executable"
+              exit 1
+            fi
+           done
+        #gamme test bash
+
+
+  run_tests:
+    runs-on: ubuntu-latest
+    needs: [check_program_compilation]
+    container: epitechcontent/epitest-docker
+    timeout-minutes: 2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run tests
+        run: make tests_run
+
+
+  push_to_mirror:
+    runs-on: ubuntu-latest
+    needs: [run_tests]
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: pixta-dev/repository-mirroring-action@v1.0.1
+        with:
+          source_repo: ${{ github.repository }}
+          destination_repo: ${{ env.MIRROR_URL }}
+          ssh_private_key: ${{ secrets.GIT_SSH_PRIVATE_KEY }}
