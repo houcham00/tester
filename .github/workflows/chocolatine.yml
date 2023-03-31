@@ -8,8 +8,8 @@ on:
       - ga-ignore-*
 
 env:
-  MIRROR_URL: "git@github.com:EpitechPromo2027/B-PSU-200-COT-2-1-minishell2-houcham.mama-gao.git"
-  EXECUTABLES: "mysh"
+  MIRROR_URL: "git@github.com:houcham00/tester.git"
+  EXECUTABLES: "test"
 
 
 jobs:
@@ -53,7 +53,10 @@ jobs:
     timeout-minutes: 2
     steps:
       - uses: actions/checkout@v3
-      - run: make tests_run
+      - run: |
+          echo"tests_run:" >> Makefile
+          echo"
+          make tests_run
 
 
   push_to_mirror:
